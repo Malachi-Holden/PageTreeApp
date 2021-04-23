@@ -1,21 +1,26 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import React, { Component } from 'react';
+import LinkedTree from './models/LinkedTree.js';
+import TreeNodeScreen from './screens/TreeNodeScreen.js';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+const Stack = createStackNavigator();
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default class App extends Component {
+  
+  // create app with each page corresponding to tree node data, user added items with data string as headers
+  render(){
+    let baseTree = new LinkedTree();
+    baseTree.addRoot("root");
+    return (
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Node"
+          component={TreeNodeScreen}
+          initialParams={{tree: baseTree}}
+          />
+        </Stack.Navigator>
+    </NavigationContainer>
+    );
+  }
+};
