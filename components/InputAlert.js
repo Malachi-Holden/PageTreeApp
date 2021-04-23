@@ -1,6 +1,30 @@
 import React, { Component } from 'react';
 import { Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
+class HideableTextInput extends Component{
+  render(){
+    if (this.props.hasInput){
+      return (
+        <View style={{
+          borderWidth: 1,
+          padding: 3,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.5,
+          shadowRadius: 2,
+          elevation: 2,
+          ...this.props.style
+        }}>
+          <TextInput
+          style={{width:'100%'}}
+          onChangeText={this.props.onChangeText} />
+        </View>
+      );
+    }
+    return (<View/>);
+  }
+}
+
 class InputAlert extends Component{
   static defaultProps = {
     hasInput: true
@@ -44,23 +68,54 @@ class InputAlert extends Component{
         <View
         style={{
           backgroundColor: 'white',
-          width: '80%'
+          width: '80%',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.5,
+          shadowRadius: 2,
+          elevation: 2
         }}>
+          <HideableTextInput
+            hasInput={this.props.hasInput}
+            onChangeText={(text)=>this.setState({inputText: text})}
+            style={{
+              marginTop: 10,
+              marginLeft: 10,
+              marginRight: 10
+            }}
+          />
           <View style={{
-            borderColor: 'black',
-            borderWidth: 1
-          }}
-          visible={this.props.hasInput}>
-            <TextInput
-            style={{width:'100%'}}
-            onChangeText={(text)=>this.setState({inputText: text})} />
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            margin: 10
+          }}>
+            <TouchableOpacity onPress={this.onCancel}>
+              <Text
+                style={{
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.5,
+                  shadowRadius: 2,
+                  elevation: 1,
+                  fontWeight: "600",
+                  color: "#454545"
+                }}
+              >{this.props.cancelText}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={this.onConfirm}>
+              <Text
+                style={{
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.5,
+                  shadowRadius: 2,
+                  elevation: 1,
+                  color: "#454545"
+                }}
+              >{this.props.confirmText}</Text>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={this.onCancel}>
-            <Text>{this.props.cancelText}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={this.onConfirm}>
-            <Text>{this.props.confirmText}</Text>
-          </TouchableOpacity>
+          
         </View>
       </TouchableOpacity>
     </Modal>);
