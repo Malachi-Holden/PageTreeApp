@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
 import InputAlert from '../components/InputAlert.js';
-import LinkedTree from '../models/LinkedTree.js';
+import { connect } from 'react-redux';
+import {replaceTree, addChild, addChildAtIndexPath, deleteNode} from '../models/slices/TreeSlice.js';
+import {getNodeAtIndexPath} from '../models/LinkedTreeRedux.js';
 
 const styles = StyleSheet.create({
   container:{
@@ -56,7 +58,7 @@ class TreeListItem extends Component{
       style={{flexGrow: 1}}
       onPress={this.props.onPress}>
         <Text style={{fontSize: 20}}>
-          {this.props.child.data()}
+          {this.props.child.data}
         </Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={this.props.onDeleteChild} style={styles.trashCanButton}>
@@ -75,9 +77,9 @@ class TreeList extends Component{
 
   render(){
     return(<FlatList style={this.props.style}
-      data={this.props.tree.children().map((child, index)=>{return {key: index.toString(), child: child, index: index}})}
+      data={this.props.tree.children.map((child, index)=>{return {key: index.toString(), child: child, index: index}})}
       renderItem={({item})=><TreeListItem child={item.child}
-        onPress={()=>{this.props.onChildPressed(item.child)}}
+        onPress={()=>{this.props.onChildPressed(item.index)}}
         onDeleteChild={()=>this.onDeleteChild(item.index)}/>
       }
       />);
@@ -87,7 +89,7 @@ class TreeList extends Component{
 class TreeNodeScreen extends Component{
   constructor(props){
     super(props);
-    this.tree = this.props.route.params.tree;
+    this.currentIndexPath = this.props.route.params.indexPath;
   }
 
   state = {
@@ -98,13 +100,12 @@ class TreeNodeScreen extends Component{
   }
 
   componentDidMount(){
-    if (this.tree){
-      this.props.navigation.setOptions({title: this.tree.data()});
-    }
+    this.props.navigation.setOptions({title: getNodeAtIndexPath(this.props.reduxTree, this.currentIndexPath).data});
   }
 
-  onChildPressed = (child)=>{
-    this.props.navigation.push('Node', {tree: child});
+  onChildPressed = (childIndex)=>{
+    let childIndexPath = [...this.currentIndexPath, childIndex];
+    this.props.navigation.push('Node', {indexPath: childIndexPath});
   }
 
   deleteChildAlert = (index)=>{
@@ -112,18 +113,19 @@ class TreeNodeScreen extends Component{
   }
 
   onDeleteChild = (text)=>{
-    this.tree.deleteNodeAtIndexPath([this.state.childToDelete]);
-    this.setState({tree: this.tree, deleteChildAlertVisible: false, childToDelete: -1});
+    let indexPath = [...this.currentIndexPath, this.state.childToDelete];
+    this.props.deleteNode(indexPath);
+    this.setState({deleteChildAlertVisible: false, childToDelete: -1});
   }
 
   addChild = (nodeText)=>{
-    this.tree.addChildToNodeAtIndexPath([], nodeText);
-    this.setState({tree: this.tree, newChildAlertVisible: false});
+    this.props.addChildAtIndexPath({indexPath: this.currentIndexPath, childData: nodeText});
+    this.setState({newChildAlertVisible: false});
   }
 
   render(){
     return(<View style={styles.container}>
-      <TreeList style={styles.treeList} tree={this.state.tree} onChildPressed={this.onChildPressed} onDeleteChild={()=>this.setState({deleteChildAlertVisible: true})} />
+      <TreeList style={styles.treeList} tree={getNodeAtIndexPath(this.props.reduxTree, this.currentIndexPath)} onChildPressed={this.onChildPressed} onDeleteChild={(index)=>this.setState({deleteChildAlertVisible: true, childToDelete: index})} />
       <InputAlert
         visible={this.state.newChildAlertVisible}
         onConfirm={this.addChild}
@@ -158,4 +160,10 @@ class TreeNodeScreen extends Component{
   }
 }
 
-export default TreeNodeScreen;
+const mapStateToProps = (state)=>({
+  reduxTree: state.tree.tree
+});
+
+const mapDispatchToProps = {replaceTree, addChild, addChildAtIndexPath, deleteNode};
+
+export default connect(mapStateToProps, mapDispatchToProps)(TreeNodeScreen);
