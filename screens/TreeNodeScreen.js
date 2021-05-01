@@ -3,7 +3,7 @@ import { FlatList, StyleSheet, Text, TouchableOpacity, View, Image } from 'react
 import InputAlert from '../components/InputAlert.js';
 import { connect } from 'react-redux';
 import {replaceTree, addChild, addChildAtIndexPath, deleteNode} from '../models/slices/TreeSlice.js';
-import {getNodeAtIndexPath} from '../models/LinkedTreeRedux.js';
+import {getNodeAtIndexPath} from '../models/LinkedTree.js';
 
 const styles = StyleSheet.create({
   container:{
@@ -100,6 +100,10 @@ class TreeNodeScreen extends Component{
   }
 
   componentDidMount(){
+    this.props.navigation.setOptions({title: getNodeAtIndexPath(this.props.reduxTree, this.currentIndexPath).data});
+  }
+
+  componentDidUpdate(){
     this.props.navigation.setOptions({title: getNodeAtIndexPath(this.props.reduxTree, this.currentIndexPath).data});
   }
 

@@ -1,15 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import {createTree, addChildToRoot, addChildToNodeAtIndexPath, deleteNodeAtIndexPath} from '../LinkedTreeRedux.js';
+import {createTree, addChildToRoot, addChildToNodeAtIndexPath, deleteNodeAtIndexPath} from '../LinkedTree.js';
 
 export const treeSlice = createSlice({
   name: 'tree',
   initialState: {
-    tree: createTree('redux root with plain tree')
+    tree: createTree('')
   },
   reducers:{
     replaceTree: (state, action)=>{
-      state.tree = action.payload
+      state.tree = action.payload;
     },
 
     addChild: (state, action)=>{

@@ -1,19 +1,21 @@
-import { Link, NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { Component } from 'react';
-import {createTree} from './models/LinkedTreeRedux.js';
+import {createTree} from './models/LinkedTree.js';
 import TreeNodeScreen from './screens/TreeNodeScreen.js';
 import store from './store.js';
+import {replaceTree} from './models/slices/TreeSlice.js';
 import { Provider } from 'react-redux';
-import NameLabelScreen from './screens/NameLabelScreen.js';
 
 const Stack = createStackNavigator();
 
 export default class App extends Component {
+
+  componentDidMount(){
+    store.dispatch(replaceTree(createTree('correct title from app')));
+  }
   
   render(){
-    let reduxTree = createTree('replacement redux root');
-    store.dispatch({type: 'replaceTree', payload: reduxTree});
     return (
       <Provider store={store}>
         <NavigationContainer>
@@ -21,9 +23,6 @@ export default class App extends Component {
             <Stack.Screen name="Node"
             component={TreeNodeScreen}
             initialParams={{indexPath: []}}
-            />
-            <Stack.Screen name="Label"
-            component={NameLabelScreen}
             />
           </Stack.Navigator>
         </NavigationContainer>
